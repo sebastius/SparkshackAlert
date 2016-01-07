@@ -16,6 +16,21 @@
 #include <SPI.h>
 #include <Wire.h>
 
+// Pin definitions
+// Connector
+// 12v, GND, -p1, +p1, -p2, +p2, -p3, +p3, -p4, +p4, -p5, +p5
+//
+// p1: gpio13 - zwaailicht
+// p2: gpio12 - sirene
+// p3: gpio2  - R
+// p4: gpio4  - G
+// p5: gpio5  - B
+
+const int zwaailicht = 13;
+const int sirene = 12;
+const int ledrood = 2;
+const int ledgroen = 4;
+const int ledblauw = 5;
 
 bool spacestate;
 bool klok_ok = false;
@@ -75,6 +90,10 @@ void setup()
   Serial.begin(115200);
   Serial.println();
 
+  pinMode(zwaailicht, OUTPUT);
+  pinMode(sirene, OUTPUT);
+  pinMode(ledrood, OUTPUT);
+  pinMode(ledblauw, OUTPUT);
 
   // We start by connecting to a WiFi network
   Serial.print("Connecting to ");
@@ -294,8 +313,15 @@ void onMqttMessage(char* topic, byte* payload, unsigned int length) {
   // NOMZ because we are hungry! Lets join the blinking lights parade!
   if (strcmp(topic, "revspace/button/nomz") == 0) {
     // Play the music
+    digitalWrite(zwaailicht, HIGH);
+    digitalWrite(sirene, HIGH);
+    
     getPage(playlist, insertcommand, eetmuziek);
     getPage(playlist, jumpcommand , emptypar);
+
+    delay(5000); // ugly...
+    digitalWrite(zwaailicht, LOW);
+    digitalWrite(sirene, LOW);
   }
 
   // DOORBELL
